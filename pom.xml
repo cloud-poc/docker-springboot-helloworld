@@ -1,0 +1,118 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>org.akj.docker</groupId>
+	<artifactId>docker-springboot-helloworld</artifactId>
+	<version>1.0.0</version>
+	<packaging>jar</packaging>
+
+	<name>docker-springboot-helloworld</name>
+	<url>http://maven.apache.org</url>
+
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.0.2.RELEASE</version>
+	</parent>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<java.version>1.8</java.version>
+		<dockerfile.maven.version>1.0.0</dockerfile.maven.version>
+		<!-- docker hub -->
+		<docker.image.prefix>oalite</docker.image.prefix>
+
+		<!-- AWS ECR -->
+		<docker.image.prefix>066703160259.dkr.ecr.ap-northeast-1.amazonaws.com/techpoc</docker.image.prefix>
+
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>repackage</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>com.spotify</groupId>
+				<artifactId>docker-maven-plugin</artifactId>
+				<version>${dockerfile.maven.version}</version>
+				<configuration>
+					<imageName>${docker.image.prefix}/${project.artifactId}:${project.version}</imageName>
+					<dockerDirectory>src/main/docker</dockerDirectory>
+					<useConfigFile>true</useConfigFile>
+					<!-- default value of pushImage should be false in dev env, true in 
+						CI env -->
+					<pushImage>true</pushImage>
+					<buildArgs>
+						<!-- <VERSION>${project.version}</VERSION> -->
+					</buildArgs>
+					<resources>
+						<resource>
+							<targetPath>/</targetPath>
+							<directory>${project.build.directory}</directory>
+							<include>${project.build.finalName}.jar</include>
+						</resource>
+					</resources>
+					<dockerHost>${docker.host}</dockerHost>
+					<dockerCertPath>${docker.certPath}</dockerCertPath>
+					<!-- <serverId>docker-hub</serverId> -->
+					<serverId>techhub-poc</serverId>
+					<registryUrl>066703160259.dkr.ecr.ap-northeast-1.amazonaws.com</registryUrl>
+				</configuration>
+				<executions>
+					<execution>
+						<id>build-image</id>
+						<phase>package</phase>
+						<goals>
+							<goal>build</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>tag-image</id>
+						<phase>package</phase>
+						<goals>
+							<goal>tag</goal>
+						</goals>
+						<configuration>
+							<image>${docker.image.prefix}/${project.artifactId}:${project.version}</image>
+							<newName>${docker.image.prefix}/${project.artifactId}:${project.version}</newName>
+						</configuration>
+					</execution>
+					<execution>
+						<id>push-image</id>
+						<phase>deploy</phase>
+						<goals>
+							<goal>push</goal>
+						</goals>
+						<configuration>
+							<imageName>${docker.image.prefix}/${project.artifactId}:${project.version}</imageName>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+</project>
