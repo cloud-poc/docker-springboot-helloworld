@@ -21,10 +21,10 @@
 		<java.version>1.8</java.version>
 		<dockerfile.maven.version>1.0.0</dockerfile.maven.version>
 		<!-- docker hub -->
-		<docker.image.prefix>oalite</docker.image.prefix>
+		<docker.image.prefix>akjamie</docker.image.prefix>
 
 		<!-- AWS ECR -->
-		<docker.image.prefix>066703160259.dkr.ecr.ap-northeast-1.amazonaws.com/techpoc</docker.image.prefix>
+		<!-- <docker.image.prefix>066703160259.dkr.ecr.ap-northeast-1.amazonaws.com/techpoc</docker.image.prefix> -->
 
 	</properties>
 
@@ -32,6 +32,12 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.logging.log4j</groupId>
+					<artifactId>log4j-api</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<dependency>
@@ -78,9 +84,9 @@
 					</resources>
 					<dockerHost>${docker.host}</dockerHost>
 					<dockerCertPath>${docker.certPath}</dockerCertPath>
-					<!-- <serverId>docker-hub</serverId> -->
-					<serverId>techhub-poc</serverId>
-					<registryUrl>066703160259.dkr.ecr.ap-northeast-1.amazonaws.com</registryUrl>
+					<serverId>docker-hub</serverId>
+					<!-- <serverId>techhub-poc</serverId>
+					<registryUrl>066703160259.dkr.ecr.ap-northeast-1.amazonaws.com</registryUrl> -->
 				</configuration>
 				<executions>
 					<execution>
@@ -109,6 +115,7 @@
 						</goals>
 						<configuration>
 							<imageName>${docker.image.prefix}/${project.artifactId}:${project.version}</imageName>
+<!-- 							<imageName>${docker.image.prefix}/${project.artifactId}:${project.version}</imageName> -->
 						</configuration>
 					</execution>
 				</executions>

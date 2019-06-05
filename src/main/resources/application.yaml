@@ -1,0 +1,3 @@
+servertomcat:
+  remote-ip-header: x-forwarded-for
+  protocol-header: x-forwarded-proto
